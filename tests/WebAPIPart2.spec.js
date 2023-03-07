@@ -1,31 +1,33 @@
-const {test, expect} = require('@playwright/test');
-const {LoginPage} = require('./pageobjects/LoginPage');
-const loginPayLoad = {userEmail:"josephklimber@gmail.com", userPassword: "Test12345678"};
-test('Browser Context-Validating Error login', async ({page}) => {
-    const email = "anshika@gmail.com";
-    const password = "Iamking@000";
-    const loginPage = new LoginPage(page);
-    await loginPage.goTo();
-    await loginPage.validLogin(email,password);
-    await page.waitForLoadState('networkidle'); // Wait for all network work has done(service base)
-    const titles = await page.locator(".card-body b").allTextContents();
-    console.log(titles);
-})
+// Login UI -> .json
 
-test('Client App login', async ({page}) => {
-    const productName = "zara coat 3";
-    const email = "anshika@gmail.com";
-    const password = "Iamking@000"
-    const products = await page.locator(".card-body");
+// test browser -> .json, cart-, order, orderdetails, orderhistory
+
+const {test, expect} = require('@playwright/test');
+const loginPayLoad = {userEmail:"josephklimber@gmail.com", userPassword: "Test12345678"};
+let webContext;
+test.beforeAll( async ({browser})=>{
+    const context = await browser.newContext();
+    const page = await context.newPage();
     await page.goto("https://rahulshettyacademy.com/client");
-    await page.locator("#userEmail").fill(email);
-    await page.locator("#userPassword").fill("");
+    await page.locator("#userEmail").fill(loginPayLoad.userEmail);
+    await page.locator("#userPassword").fill(loginPayLoad.userPassword);
     await Promise.all(
         [
             await page.locator("[value='Login']").click(),
             await page.waitForLoadState('networkidle'), // Wait for all network work has done(service base)
         ]
-      );
+    );
+    await context.storageState({path: 'state.json'});
+    webContext = await browser.newContext({storageState: 'state.json'});
+})
+
+
+test('Client App login', async () => {
+    const productName = "zara coat 3";
+    const email = "anshika@gmail.com";
+    const page = await webContext.newPage();
+    const products = await page.locator(".card-body");
+    await page.goto("https://rahulshettyacademy.com/client");
     for (let i = 0; i < (await products.count()); i++){
         if(await products.nth(i).locator("b").textContent() === productName){
             await products.nth(i).locator("text=Add To Cart").click();

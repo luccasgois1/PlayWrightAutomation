@@ -16,6 +16,9 @@ test('Browser Context Playwright test - Wrong credentials', async ({browser}) =>
 test('Browser Context Playwright test - Right credentials', async ({browser}) => {
   const context = await browser.newContext();
   const page = await context.newPage();
+  // await page.route('**/*.{jpg,png,jpeg,css}', route=>route.abort()); // Abort routes for import images
+  page.on('request', request=> console.log('REQUEST --> ', request.url()));
+  page.on('response', response=>console.log('RESPONSE <-- ',response.url(), response.status()));
   await page.goto('https://rahulshettyacademy.com/loginpagePractise/');
   const locators = {
     userName: page.locator('input#username'),
