@@ -14,12 +14,12 @@ test('Browser Context-Validating Error login', async ({page}) => {
 
 test('Client App login', async ({page}) => {
     const productName = "zara coat 3";
-    const email = "anshika@gmail.com";
-    const password = "Iamking@000"
+    const email = loginPayLoad.userEmail;
+    const password = loginPayLoad.userPassword;
     const products = await page.locator(".card-body");
     await page.goto("https://rahulshettyacademy.com/client");
     await page.locator("#userEmail").fill(email);
-    await page.locator("#userPassword").fill("");
+    await page.locator("#userPassword").fill(password);
     await Promise.all(
         [
             await page.locator("[value='Login']").click(),

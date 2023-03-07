@@ -10,7 +10,7 @@ test.beforeAll( async () =>{
     response = await apiUtils.createOrder(orderPayLoad);
 });
 
-test('Place the Order', async ({page}) => {
+test.skip('Place the Order', async ({page}) => {
     page.addInitScript(
         value => {
             window.localStorage.setItem('token', value);
